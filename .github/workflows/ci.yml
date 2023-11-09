@@ -12,7 +12,7 @@ jobs:
         uses: actions/setup-python@v3
 
       - name: install dependencies
-        run: python -m pip install pytest
+        run: python -m pip install pytest gspread python-dotenv pandas==1.2.4
 
       - name: run tests
         run: pytest
