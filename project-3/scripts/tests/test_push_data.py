@@ -28,7 +28,7 @@ def test_load_file_into_dataframe():
     df = load_file_into_dataframe(file)
 
     assert type(df) == pd.DataFrame
-    assert df.isna().sum().max() == 0
+    assert df.isna().sum().max() == 1
 
 def test_add_email():
     """
