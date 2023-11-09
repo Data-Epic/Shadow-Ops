@@ -24,7 +24,7 @@ def test_load_file_into_dataframe():
     tests the load dataframe function
     """
 
-    file = "gspread-project/data/Housing_dataset_train.csv"
+    file = "project-3/data/Housing_dataset_train.csv"
     df = load_file_into_dataframe(file)
 
     assert type(df) == pd.DataFrame
