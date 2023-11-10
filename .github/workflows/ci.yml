@@ -2,9 +2,6 @@ name: CI-test
 
 on: [push, pull_request]
 
-env:
-  service_file_path: ${{ secrets.GOOGLE_SECRET_KEY }}
-
 jobs:
   build:
     strategy:
@@ -13,6 +10,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
     runs-on: ${{ matrix.os }}
+    env:
+      service_file_path: ${{ secrets.GOOGLE_SECRET_KEY }}
     steps:
       - name: checkout code
         uses: actions/checkout@v4
