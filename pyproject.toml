@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "gspread-package-dev"
+version = "0.1.0"
+description = ""
+authors = ["GbotemiB gbotemibolarinwa@gmail.compe"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+gspread = "^5.12.0"
+pandas = "^2.1.3"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
