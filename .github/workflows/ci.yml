@@ -2,6 +2,9 @@ name: CI-test
 
 on: [push, pull_request]
 
+envs:
+  service_file_path: ${{ secrets.GOOGLE_SECRET_KEY }}
+
 jobs:
   build:
     strategy:
