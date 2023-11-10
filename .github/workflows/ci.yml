@@ -27,6 +27,7 @@ jobs:
 
       - name: run tests
         run: pytest
+        run: pytest --cov
 
       - name: run coverage
         uses: codecov/codecov-action@v3
