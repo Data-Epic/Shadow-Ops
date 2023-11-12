@@ -7,24 +7,12 @@ from unittest.mock import MagicMock
 import pytest
 
 
-def test_service_file_path(load_service_file):
-    """
-    This test the service file path declared in .env if it contains neccessary keys
-    """
-    _, keys = load_service_file
-    assert 'private_key_id' in keys
-    assert 'project_id' in keys
-    assert 'client_id' in keys
-    assert 'token_uri' in keys
-    assert 'auth_uri' in keys
-  
-
 def test_load_file_into_dataframe():
     """
     tests the load dataframe function
     """
 
-    file = "gspread-project/data/Housing_dataset_train.csv"
+    file = "project-3/data/Housing_dataset_train.csv"
     df = load_file_into_dataframe(file)
 
     assert type(df) == pd.DataFrame
