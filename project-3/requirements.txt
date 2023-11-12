@@ -1,5 +1,0 @@
-pandas
-gspread
-python-dotenv
-pytest
-pytest-cov
