@@ -22,13 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}      
         
       - name: setup poetry
-        uses: Gr1N/setup-poetry@v8
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - run: poetry --version
+        uses: snok/install-poetry@v1
 
       - name: install dependencies
         run: poetry install
