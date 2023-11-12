@@ -1,5 +1,6 @@
 name: CI-test
 
+# Controls when the action will run.
 on: [push, pull_request]
 
 jobs:
@@ -14,18 +15,22 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4
 
+      # setup python with different versions
       - name: setup python version ${{ matrix.python-version}}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}      
 
-      - name: install and configure poetry
+      # install poetry
+      - name: install poetry
         run: pipx install poetry
 
+      # install dependencies with poetry
       - name: Install dependencies
         run: |
           poetry install
 
-      - name: run tests
+      # run tests with pytest coverage option
+      - name: run tests with coverage
         run: poetry run pytest --cov
       
