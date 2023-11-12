@@ -20,17 +20,18 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}      
-          cache: 'pip'  
+        
+      - name: setup poetry
+        uses: Gr1N/setup-poetry@v8
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - run: poetry --version
 
       - name: install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r project-3/requirements.txt
+        run: poetry install
 
-      - name: run tests
-        run: pytest
-      
-      - name: run coverage
-        run: pytest --cov
-
-      
+      - name: run tests with coverage
+        run: poetry run pytest --cov
