@@ -20,12 +20,14 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}      
-        
-      - name: setup poetry
-        uses: abatilo/actions-poetry@v2
+          cache: 'pip'  
+
+      - name: install poetry
+        run: pipx install poetry
 
       - name: install dependencies
-        run: poetry install --no-interaction --no-root
+        run: poetry install 
 
-      - name: run tests with coverage
+      - name: run tests
         run: poetry run pytest --cov
+      
