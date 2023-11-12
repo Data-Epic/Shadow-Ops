@@ -2,7 +2,7 @@
 name = "gspread-package-dev"
 version = "0.1.0"
 description = ""
-authors = ["GbotemiB gbotemibolarinwa@gmail.compe"]
+authors = ["Gbotemi Bolarinwa gbotemibolarinwa@gmail.com"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
