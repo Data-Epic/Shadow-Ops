@@ -25,8 +25,9 @@ jobs:
       - name: install poetry
         run: pipx install poetry
 
-      - name: install dependencies
-        run: poetry install 
+      - name: Install dependencies
+        run: |
+          poetry install
 
       - name: run tests
         run: poetry run pytest --cov
