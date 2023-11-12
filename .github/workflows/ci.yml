@@ -7,8 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.11"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout code
@@ -20,14 +20,11 @@ jobs:
           python-version: ${{ matrix.python-version }}      
 
       - name: install poetry
-        run: |
-          pipx install poetry
-          poetry install
+        run: pipx install poetry
 
-      # - name: Install dependencies
-      #   run: |
-      #     poetry shell
-      #     poetry install
+      - name: Install dependencies
+        run: |
+          poetry install
 
       - name: run tests
         run: poetry run pytest --cov
