@@ -19,7 +19,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}      
 
-
       - name: install poetry
         run: pipx install poetry
 
