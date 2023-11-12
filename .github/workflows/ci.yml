@@ -24,6 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry shell
           poetry install
 
       - name: run tests
