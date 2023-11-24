@@ -124,7 +124,8 @@ def ingest_data(conn: sql.connection, data: pd.DataFrame) -> None:
 if __name__=="__main__":
 
     load_dotenv()
-
+    
+    # loading environment variables
     database = os.environ.get("DATABASE")
     db_user = os.environ.get("DB_USER")
     db_password = os.environ.get("DB_PASSWORD")
