@@ -10,5 +10,7 @@ The data source is from a Nigerian Housing Dataset loaded into google sheets whi
 - MySql
 
 ## How to run the project
+poetry config virtualenvs.in-project true
 
 ## Outputs
+![alt image](/project-5/images/select-query.png)]
