@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 # connect database
 def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, HOST: str) -> sql.connection:
     """
-    this functions creates a connection to the database
+    functions creates a connection to the database
     """
 
     connection = sql.connect(
@@ -29,7 +29,7 @@ def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, HOST: str) -> sql.
 # create table
 def create_table(connection: sql.connection) -> None:
     """
-    this functions creates a table in the specified database if doesnt exist
+    functions creates a table in the specified database if doesnt exist
     """
     # query to create table in the database
     query = """ 
@@ -62,7 +62,7 @@ def create_table(connection: sql.connection) -> None:
 # load data into dataframe
 def load_data(url: str, sheet_title: str) -> pd.DataFrame:
     """
-    this functions loads data from google sheets into pandas dataframe
+    functions loads data from google sheets into pandas dataframe
     """
     # using gspread to open the data by url
     gc = gspread.service_account()
@@ -124,7 +124,7 @@ def ingest_data(conn: sql.connection, data: pd.DataFrame) -> None:
 if __name__=="__main__":
 
     load_dotenv()
-    
+
     # loading environment variables
     database = os.environ.get("DATABASE")
     db_user = os.environ.get("DB_USER")
