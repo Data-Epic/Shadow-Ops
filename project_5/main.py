@@ -6,6 +6,8 @@ import gspread
 import logging
 from dotenv import load_dotenv
 import mysql.connector as sql
+from mysql.connector.errors import Error
+from mysql.connector import errorcode
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -38,16 +40,17 @@ def create_table(connection: sql.connection) -> None:
     # query to create table in the database
     query = """ 
             CREATE TABLE housing_dataset(
-            serial_no INT AUTO_INCREMENT,
-            id INT NOT NULL,
+            id INT AUTO_INCREMENT,
+            housing_id INT NOT NULL,
             location VARCHAR(20) DEFAULT NULL,
             title VARCHAR(20) DEFAULT NULL,
             bedroom INT DEFAULT NULL,
             bathroom INT DEFAULT NULL,
             parking_space INT DEFAULT NULL,
             price FLOAT DEFAULT NULL,
-            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (serial_no)
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE NOW(),
+            PRIMARY KEY (id)
     );
     """
 
@@ -58,10 +61,17 @@ def create_table(connection: sql.connection) -> None:
 
             connection.commit()
             logging.info("table created successfully")
-    except:
-        logging.info("table already exists")
+    except sql.Error as err:
+        # handling if table already exists
+        if err.errno == 1050:
+            logging.info(f"{err}")
+
+        # handling if there is a syntax error
+        elif err.errno == 1064:
+            raise SyntaxError(f"{err}")
+        else:
+            logging.error(f"{err}")
     
-    return None
 
 # load data into dataframe
 def load_data(url: str, sheet_title: str) -> pd.DataFrame:
@@ -97,7 +107,7 @@ def validate_row(row: pd.Series) -> bool:
 
     type_checks = [id, loc, title, bedroom, bathroom, parking_space, price]
 
-    if False in type_checks:
+    if not all(type_checks):
         return False
 
     return True
@@ -111,18 +121,25 @@ def ingest_data(conn: sql.connection, data: pd.DataFrame) -> None:
     # columns to use in loading the data
     columns = ", ".join([str(x) for x in data.columns.tolist()])
 
-    logging.info("data ingestion starting...")
-    with conn.cursor() as cursor:
-        for i, v in data.iterrows():
-            if validate_row(v) == True:
-                sql = "INSERT INTO housing_dataset (%s) VALUES %s" % (columns, tuple(v))
-                cursor.execute(sql)
-                conn.commit()
-            else:
-                logging.error(f"invalid datatype on row {i+2}")
-        logging.info("data ingestion completed")
+    try:
+        logging.info("data ingestion starting...")
+        with conn.cursor() as cursor:
+            for i, v in data.iterrows():
+                if validate_row(v) == True:
+                    sql = "INSERT INTO housing_dataset (%s) VALUES %s" % (columns, tuple(v))
+                    cursor.execute(sql)
+                    conn.commit()
+                else:
+                    logging.error(f"invalid datatype on row {i+2}")
+            logging.info("data ingestion completed")
 
-        return None
+    except sql.Error as err:
+        # handling syntax error
+        if err.errno == 1064:
+            raise SyntaxError(f"{err}")
+        else:
+            logging.error(f"{err}") 
+
 
 def run():
 
