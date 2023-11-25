@@ -12,24 +12,28 @@ warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
 # connect database
-def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, HOST: str) -> sql.connection:
+def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, DB_HOST: str) -> sql.connection:
     """
-    this functions creates a connection to the database
+    functions creates a connection to the database
     """
 
-    connection = sql.connect(
-        database=DATABASE,
-        user=DB_USER,
-        host=HOST,
-        password=DB_PASSWORD,
-    )
-    logging.info("opening connection to database")
+    try:
+        connection = sql.connect(
+            database=DATABASE,
+            user=DB_USER,
+            host=DB_HOST,
+            password=DB_PASSWORD,
+        )
+        logging.info("opening connection to database")
+    except:
+        raise Exception("Cant connect to database")
+        
     return connection
 
 # create table
 def create_table(connection: sql.connection) -> None:
     """
-    this functions creates a table in the specified database if doesnt exist
+    functions creates a table in the specified database if doesnt exist
     """
     # query to create table in the database
     query = """ 
@@ -62,7 +66,7 @@ def create_table(connection: sql.connection) -> None:
 # load data into dataframe
 def load_data(url: str, sheet_title: str) -> pd.DataFrame:
     """
-    this functions loads data from google sheets into pandas dataframe
+    functions loads data from google sheets into pandas dataframe
     """
     # using gspread to open the data by url
     gc = gspread.service_account()
@@ -120,16 +124,15 @@ def ingest_data(conn: sql.connection, data: pd.DataFrame) -> None:
 
         return None
 
-
-if __name__=="__main__":
+def run():
 
     load_dotenv()
-    
+
     # loading environment variables
     database = os.environ.get("DATABASE")
     db_user = os.environ.get("DB_USER")
     db_password = os.environ.get("DB_PASSWORD")
-    host = os.environ.get("HOST")
+    host = os.environ.get("DB_HOST")
     url = os.environ.get("URL")
     sheet = os.environ.get("SHEET")
 
@@ -139,3 +142,8 @@ if __name__=="__main__":
     ingest_data(conn, data)
     conn.close()
     logging.info("database connection closed")
+
+if __name__=="__main__":
+    run()
+
+
