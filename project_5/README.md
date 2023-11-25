@@ -8,8 +8,30 @@ The data source is from a Nigerian Housing Dataset loaded into google sheets whi
 ## Technology Stack
 - Python
 - MySql
+- Poetry
 
-## How to run the project
-poetry exit
+## Getting Started
+
+#### Install poetry
+``` curl -sSL https://install.python-poetry.org | python3 -```
+
+confirm that poetry has succesully installed by running `poetry --version`
+
+clone project using the following command
+
+```git clone https://github.com/Data-Epic/Shadow-Ops.git```
+
+change directory into the `project_5` folder using `cd Shadow-Ops/project_5`
+
+configure environment variables
+use `.env.example` to configure `.env` to store environment variables
+
+#### 
+``` bash
+poetry config virtualenvs.in-project true
+poetry install
+poetry shell
+poetry run app
+```
 
 ## Outputs
