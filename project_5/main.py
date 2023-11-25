@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 
 # connect database
-def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, DB_HOST: str) -> sql.connection:
+def connect_db(DATABASE: str, db_user: str, db_password: str, db_host: str) -> sql.connection:
     """
     functions creates a connection to the database
     """
@@ -20,9 +20,9 @@ def connect_db(DATABASE: str, DB_USER: str, DB_PASSWORD: str, DB_HOST: str) -> s
     try:
         connection = sql.connect(
             database=DATABASE,
-            user=DB_USER,
-            host=DB_HOST,
-            password=DB_PASSWORD,
+            user=db_user,
+            host=db_host,
+            password=db_password,
         )
         logging.info("opening connection to database")
     except:
@@ -39,8 +39,8 @@ def create_table(connection: sql.connection) -> None:
     query = """ 
             CREATE TABLE housing_dataset(
             serial_no INT AUTO_INCREMENT,
-            ID INT NOT NULL,
-            loc VARCHAR(20) DEFAULT NULL,
+            id INT NOT NULL,
+            location VARCHAR(20) DEFAULT NULL,
             title VARCHAR(20) DEFAULT NULL,
             bedroom INT DEFAULT NULL,
             bathroom INT DEFAULT NULL,
@@ -119,7 +119,7 @@ def ingest_data(conn: sql.connection, data: pd.DataFrame) -> None:
                 cursor.execute(sql)
                 conn.commit()
             else:
-                logging.error(f"invalid datatype on row {i}")
+                logging.error(f"invalid datatype on row {i+2}")
         logging.info("data ingestion completed")
 
         return None
