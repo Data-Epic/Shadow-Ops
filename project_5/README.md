@@ -37,3 +37,5 @@ poetry run app
 ```
 
 ## Outputs
+
+![alt image](images/select-query.png)
