@@ -16,6 +16,7 @@ The data source is from a Nigerian Housing Dataset loaded into google sheets whi
 ``` curl -sSL https://install.python-poetry.org | python3 -```
 
 confirm that poetry has succesully installed by running `poetry --version`
+
 run `poetry config virtualenvs.in-project true` to set poetry to create virtualenv in project folder
 
 clone project using the following command
