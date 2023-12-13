@@ -1,6 +1,15 @@
 # import libraries
 import os
-from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, Date, DateTime, Float
+from sqlalchemy import (
+    create_engine,
+    ForeignKey,
+    Column,
+    String,
+    Integer,
+    Date,
+    DateTime,
+    Float,
+)
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -10,18 +19,24 @@ from dotenv import load_dotenv
 import numpy as np
 import logging
 import datetime
+import warnings
+
+warnings.filterwarnings("ignore")
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 Base = declarative_base()
+
 
 # create orm sql classes
 class Artwork(Base):
     """
     A class to create an Artwork table using ORM classes
     """
+
     __tablename__ = "artwork"
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = {"extend_existing": True}
 
     ConstituentID = Column(Integer, primary_key=True)
     DisplayName = Column(String, nullable=False)
@@ -41,6 +56,14 @@ class Artwork(Base):
     DateAcquired_month = Column(Integer)
     DateAcquired_weekday = Column(Integer)
 
+    def __repr__(self):
+        return f"({self.AccessionNumber} {self.BeginDate} \
+            {self.Classification} {self.ConstituentID} {self.DateAcquired} \
+                {self.DateAcquired_month} {self.DateAcquired_weekday} \
+                    {self.DateAcquired_year} {self.Department} {self.DisplayName} \
+                        {self.EndDate} {self.Gender} {self.Medium} {self.Nationality} \
+                            {self.ObjectID} {self.Title} {self.completedDate})"
+
 
 # load data into dataframe
 def load_data_from_file(path: str) -> pd.DataFrame:
@@ -51,7 +74,7 @@ def load_data_from_file(path: str) -> pd.DataFrame:
     ----------
         path : str
             filepath to the parquet file
-    
+
     Returns
     -------
         Pandas DataFrame
@@ -65,6 +88,7 @@ def load_data_from_file(path: str) -> pd.DataFrame:
 
     return data
 
+
 # data validation
 def type_check(row: dict) -> bool:
     """
@@ -75,7 +99,7 @@ def type_check(row: dict) -> bool:
     ----------
         row : dict
             variable containing values of a row
-    
+
     Returns
     -------
         Boolean
@@ -83,33 +107,33 @@ def type_check(row: dict) -> bool:
 
     # dictionary containing data types that will be used for validation
     dict_row_type = {
-        'ConstituentID': int,
-        'DisplayName': str,
-        'Nationality': str,
-        'Gender': str,
-        'BeginDate': int,
-        'EndDate': int,
-        'Wiki QID': str,
-        'ULAN': float,
-        'Title': str,
-        'Medium': str,
-        'Dimensions': str,
-        'CreditLine': str,
-        'AccessionNumber': str,
-        'Classification': str,
-        'Department': str,
-        'DateAcquired': datetime.datetime,
-        'Cataloged': str,
-        'ObjectID': float,
-        'URL': str,
-        'ThumbnailURL': str,
-        'Height (cm)': float,
-        'Width (cm)': float,
-        'completedDate': float,
-        'DateAcquired_year': int,
-        'DateAcquired_month': int,
-        'DateAcquired_day': int,
-        'DateAcquired_weekday': int
+        "ConstituentID": int,
+        "DisplayName": str,
+        "Nationality": str,
+        "Gender": str,
+        "BeginDate": int,
+        "EndDate": int,
+        "Wiki QID": str,
+        "ULAN": float,
+        "Title": str,
+        "Medium": str,
+        "Dimensions": str,
+        "CreditLine": str,
+        "AccessionNumber": str,
+        "Classification": str,
+        "Department": str,
+        "DateAcquired": datetime.datetime,
+        "Cataloged": str,
+        "ObjectID": float,
+        "URL": str,
+        "ThumbnailURL": str,
+        "Height (cm)": float,
+        "Width (cm)": float,
+        "completedDate": float,
+        "DateAcquired_year": int,
+        "DateAcquired_month": int,
+        "DateAcquired_day": int,
+        "DateAcquired_weekday": int,
     }
 
     # check for datatypes of input against the validation dictionary
@@ -118,6 +142,7 @@ def type_check(row: dict) -> bool:
             logging.error(f"type check failed for :{idx}, {row[idx]}")
             return False
     return True
+
 
 # ingest data
 def ingest_data(data: pd.DataFrame) -> None:
@@ -128,7 +153,7 @@ def ingest_data(data: pd.DataFrame) -> None:
     ----------
         data : pd.DataFrame
             data to be ingested into dataframe
-    
+
     Returns
     -------
         None
@@ -156,25 +181,22 @@ def ingest_data(data: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-
     # load environment variables
     username = os.environ.get("username")
     password = os.environ.get("password")
     host = os.environ.get("host")
     path = os.environ.get("path")
 
+    # create connection to postgres
     engine = create_engine(
         f"postgresql+psycopg2://{username}:{password}@{host}")
-
+    # create table in db
     Base.metadata.create_all(bind=engine)
 
     logging.info("opening database session")
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    with Session(bind=engine) as session:
+        data_path = path
+        data = load_data_from_file(data_path)
+        ingest_data(data)
 
-    data_path = path
-    data = load_data_from_file(data_path)
-    ingest_data(data)
-
-    session.close_all()
     logging.info("closing all session")
