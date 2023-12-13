@@ -11,6 +11,10 @@ import numpy as np
 import logging
 import datetime
 
+load_dotenv()
+
+Base = declarative_base()
+
 # create orm sql classes
 class Artwork(Base):
     """
@@ -57,6 +61,8 @@ def load_data_from_file(path: str) -> pd.DataFrame:
     except:
         raise SyntaxError("unable to load data from path")
 
+    logging.info("Data loaded into dataframe successfully")
+
     return data
 
 # data validation
@@ -75,6 +81,7 @@ def type_check(row: dict) -> bool:
         Boolean
     """
 
+    # dictionary containing data types that will be used for validation
     dict_row_type = {
         'ConstituentID': int,
         'DisplayName': str,
@@ -105,9 +112,10 @@ def type_check(row: dict) -> bool:
         'DateAcquired_weekday': int
     }
 
+    # check for datatypes of input against the validation dictionary
     for idx in row.keys():
         if isinstance(row[idx], dict_row_type[idx]) is False:
-            print(idx, row[idx])
+            logging.error(f"type check failed for :{idx}, {row[idx]}")
             return False
     return True
 
@@ -125,16 +133,19 @@ def ingest_data(data: pd.DataFrame) -> None:
     -------
         None
     """
+
+    # iterate through the data to insert the values into the database
     for idx in data.iterrows():
         try:
             row = idx[1].to_dict()
-            if type_check(row, dict_row_type):
+
+            # validate the row before inserting into db
+            if type_check(row):
                 line = Artwork()
                 for key, value in row.items():
                     setattr(line, key, value)
                 session.add(line)
                 session.commit()
-                logging.info(f"successfully logged {idx[0]}")
             else:
                 logging.error(f"type check failed for {idx[0]}:{row}")
         except IntegrityError as e:
@@ -145,9 +156,8 @@ def ingest_data(data: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    Base = declarative_base()
 
+    # load environment variables
     username = os.environ.get("username")
     password = os.environ.get("password")
     host = os.environ.get("host")
@@ -158,6 +168,7 @@ if __name__ == "__main__":
 
     Base.metadata.create_all(bind=engine)
 
+    logging.info("opening database session")
     Session = sessionmaker(bind=engine)
     session = Session()
 
@@ -166,3 +177,4 @@ if __name__ == "__main__":
     ingest_data(data)
 
     session.close_all()
+    logging.info("closing all session")
