@@ -25,7 +25,7 @@ Base = declarative_base()
 
 
 # create orm sql classes
-class Artwork(Base):
+class ArtWork(Base):
     """
     A class to create an Artwork table using ORM classes
     """
@@ -33,31 +33,31 @@ class Artwork(Base):
     __tablename__ = "artwork"
     __table_args__ = {"extend_existing": True}
 
-    ConstituentID = Column(Integer, primary_key=True, index=True)
-    DisplayName = Column(String, nullable=False)
-    Nationality = Column(String)
-    Gender = Column(String)
-    BeginDate = Column(Integer)
-    EndDate = Column(Integer)
-    Title = Column(String)
-    Medium = Column(String)
-    AccessionNumber = Column(String)
-    Classification = Column(String)
-    Department = Column(String)
-    DateAcquired = Column(DateTime)
-    ObjectID = Column(Integer, primary_key=True, index=True)
-    completedDate = Column(Integer)
-    DateAcquired_year = Column(Integer)
-    DateAcquired_month = Column(Integer)
-    DateAcquired_weekday = Column(Integer)
+    constituent_id = Column(Integer, primary_key=True, index=True)
+    display_name = Column(String, nullable=False)
+    nationality = Column(String)
+    gender = Column(String)
+    begin_date = Column(Integer)
+    end_date = Column(Integer)
+    title = Column(String)
+    medium = Column(String)
+    accession_number = Column(String)
+    classification = Column(String)
+    department = Column(String)
+    date_acquired = Column(DateTime)
+    object_id = Column(Integer, primary_key=True, index=True)
+    completed_date = Column(Integer)
+    date_acquired_year = Column(Integer)
+    date_acquired_month = Column(Integer)
+    date_acquired_weekday = Column(Integer)
 
     def __repr__(self):
-        return f"({self.AccessionNumber} {self.BeginDate} \
-            {self.Classification} {self.ConstituentID} {self.DateAcquired} \
-                {self.DateAcquired_month} {self.DateAcquired_weekday} \
-                    {self.DateAcquired_year} {self.Department} {self.DisplayName} \
-                        {self.EndDate} {self.Gender} {self.Medium} {self.Nationality} \
-                            {self.ObjectID} {self.Title} {self.completedDate})"
+        return f"({self.accession_number} {self.begin_date} \
+            {self.classification} {self.constituent_id} {self.date_acquired} \
+                {self.date_acquired_month} {self.date_acquired_weekday} \
+                    {self.date_acquired_year} {self.department} {self.DisplayName} \
+                        {self.end_date} {self.gender} {self.medium} {self.Nationality} \
+                            {self.object_id} {self.title} {self.completed_date})"
 
 
 # load data into dataframe
@@ -77,6 +77,7 @@ def load_data_from_file(path: str) -> pd.DataFrame:
     try:
         data = pd.read_parquet(path)
     except:
+        print(path)
         raise SyntaxError("unable to load data from path")
 
     logging.info("Data loaded into dataframe successfully")
@@ -134,7 +135,7 @@ def type_check(row: dict) -> bool:
     # check for datatypes of input against the validation dictionary
     for idx in row.keys():
         if isinstance(row[idx], dict_row_type[idx]) is False:
-            logging.error(f"type check failed for :{idx}, {row[idx]}")
+            logging.error(f"Type check failed for :{idx}, {row[idx]}")
             return False
     return True
 
@@ -159,29 +160,29 @@ def ingest_data(data: pd.DataFrame) -> None:
         try:
             row = idx[1].to_dict()
 
-            logging.info("data ingestion into database started")
+            logging.info("Data ingestion into database started")
             # validate the row before inserting into db
             if type_check(row):
-                line = Artwork()
+                line = ArtWork()
                 for key, value in row.items():
                     setattr(line, key, value)
                 session.add(line)
                 session.commit()
             else:
-                logging.error(f"type check failed for {idx[0]}:{row}")
+                logging.debug(f"Type check failed for {idx[0]}:{row}")
         except IntegrityError as e:
             logging.error(e)
             session.rollback()
 
-    logging.info("data ingestion completed")
+    logging.info("Data ingestion completed")
 
 
 if __name__ == "__main__":
     # load environment variables
-    username = os.environ.get("username")
-    password = os.environ.get("password")
-    host = os.environ.get("host")
-    path = os.environ.get("path")
+    username = os.environ.get("USERNAME")
+    password = os.environ.get("PASSWORD")
+    host = os.environ.get("HOST")
+    path = os.environ.get("PATH")
 
     # create connection to postgres
     engine = create_engine(
@@ -190,9 +191,9 @@ if __name__ == "__main__":
     Base.metadata.create_all(bind=engine)
 
     with Session(bind=engine) as session:
-        logging.info("opening database session")
+        logging.info("Opening database session")
         data_path = path
         data = load_data_from_file(data_path)
         ingest_data(data)
 
-    logging.info("closing all session")
+    logging.info("Closing all session")
