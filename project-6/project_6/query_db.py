@@ -23,7 +23,7 @@ Base.metadata.create_all(bind=engine)
 # total records in database
 with Session(bind=engine) as session:
     query = session.query(ArtWork).count()
-    logging.info(f"number of records is : {query}")
+    logging.info(f"Number of records is : {query}")
 
 # top 5 nationalities in database
 with Session(bind=engine) as session:
