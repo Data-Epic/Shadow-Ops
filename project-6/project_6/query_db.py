@@ -39,7 +39,7 @@ with Session(bind=engine) as session:
             func.count(Artwork.Department).desc())
     logging.info(f"Departments : {query.all()}")
 
-# Top 5 medium used in the database
+# top 5 medium used in the database
 with Session(bind=engine) as session:
     query = session.query(Artwork.Medium, func.count(Artwork.Medium)).group_by(
         Artwork.Medium).order_by(func.count(Artwork.Medium).desc())
