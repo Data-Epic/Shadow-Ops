@@ -33,7 +33,7 @@ class Artwork(Base):
     __tablename__ = "artwork"
     __table_args__ = {"extend_existing": True}
 
-    ConstituentID = Column(Integer, primary_key=True)
+    ConstituentID = Column(Integer, primary_key=True, index=True)
     DisplayName = Column(String, nullable=False)
     Nationality = Column(String)
     Gender = Column(String)
@@ -45,7 +45,7 @@ class Artwork(Base):
     Classification = Column(String)
     Department = Column(String)
     DateAcquired = Column(DateTime)
-    ObjectID = Column(Integer, primary_key=True)
+    ObjectID = Column(Integer, primary_key=True, index=True)
     completedDate = Column(Integer)
     DateAcquired_year = Column(Integer)
     DateAcquired_month = Column(Integer)
@@ -159,6 +159,7 @@ def ingest_data(data: pd.DataFrame) -> None:
         try:
             row = idx[1].to_dict()
 
+            logging.info("data ingestion into database started")
             # validate the row before inserting into db
             if type_check(row):
                 line = Artwork()
@@ -188,8 +189,8 @@ if __name__ == "__main__":
     # create table in db
     Base.metadata.create_all(bind=engine)
 
-    logging.info("opening database session")
     with Session(bind=engine) as session:
+        logging.info("opening database session")
         data_path = path
         data = load_data_from_file(data_path)
         ingest_data(data)
