@@ -2,21 +2,16 @@
 import os
 from sqlalchemy import (
     create_engine,
-    ForeignKey,
     Column,
     String,
     Integer,
-    Date,
     DateTime,
     Float,
 )
-from sqlalchemy import PrimaryKeyConstraint
-from sqlalchemy.ext.indexable import index_property
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import Session, declarative_base
 from sqlalchemy.exc import IntegrityError
 import pandas as pd
 from dotenv import load_dotenv
-import numpy as np
 import logging
 import datetime
 import warnings
