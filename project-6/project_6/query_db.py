@@ -11,12 +11,10 @@ from main import ArtWork
 # load environment variables
 load_dotenv()
 
-username = os.environ.get("USER")
-password = os.environ.get("PASSWORD")
-host = os.environ.get("HOST")
+db_uri = os.environ.get("DB_URI")
 
 # prepare connection to db
-engine = create_engine(f"postgresql+psycopg2://{username}:{password}@{host}")
+engine = create_engine(db_uri)
 Base = declarative_base()
 Base.metadata.create_all(bind=engine)
 
