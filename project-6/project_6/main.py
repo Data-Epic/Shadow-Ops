@@ -179,14 +179,10 @@ def ingest_data(data: pd.DataFrame) -> None:
 
 if __name__ == "__main__":
     # load environment variables
-    username = os.environ.get("USERNAME")
-    password = os.environ.get("PASSWORD")
-    host = os.environ.get("HOST")
-    path = os.environ.get("PATH")
+    db_uri = os.environ.get("DB_URI")
 
     # create connection to postgres
-    engine = create_engine(
-        f"postgresql+psycopg2://{username}:{password}@{host}")
+    engine = create_engine(db_uri)
     # create table in db
     Base.metadata.create_all(bind=engine)
 
