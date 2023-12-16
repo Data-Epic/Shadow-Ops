@@ -55,8 +55,8 @@ class ArtWork(Base):
         return f"({self.accession_number} {self.begin_date} \
             {self.classification} {self.constituent_id} {self.date_acquired} \
                 {self.date_acquired_month} {self.date_acquired_weekday} \
-                    {self.date_acquired_year} {self.department} {self.DisplayName} \
-                        {self.end_date} {self.gender} {self.medium} {self.Nationality} \
+                    {self.date_acquired_year} {self.department} {self.display_name} \
+                        {self.end_date} {self.gender} {self.medium} {self.nationality} \
                             {self.object_id} {self.title} {self.completed_date})"
 
 
@@ -77,7 +77,7 @@ def load_data_from_file(path: str) -> pd.DataFrame:
     try:
         data = pd.read_parquet(path)
     except:
-        print(path)
+        logging.debug(f"please verify path: {path}")
         raise SyntaxError("unable to load data from path")
 
     logging.info("Data loaded into dataframe successfully")
@@ -103,42 +103,67 @@ def type_check(row: dict) -> bool:
 
     # dictionary containing data types that will be used for validation
     dict_row_type = {
-        "ConstituentID": int,
-        "DisplayName": str,
-        "Nationality": str,
-        "Gender": str,
-        "BeginDate": int,
-        "EndDate": int,
-        "Wiki QID": str,
-        "ULAN": float,
-        "Title": str,
-        "Medium": str,
-        "Dimensions": str,
-        "CreditLine": str,
-        "AccessionNumber": str,
-        "Classification": str,
-        "Department": str,
-        "DateAcquired": datetime.datetime,
-        "Cataloged": str,
-        "ObjectID": float,
-        "URL": str,
-        "ThumbnailURL": str,
-        "Height (cm)": float,
-        "Width (cm)": float,
-        "completedDate": float,
-        "DateAcquired_year": int,
-        "DateAcquired_month": int,
-        "DateAcquired_day": int,
-        "DateAcquired_weekday": int,
+        "constituent_id": int,
+        "display_name": str,
+        "nationality": str,
+        "gender": str,
+        "begin_date": int,
+        "end_date": int,
+        "title": str,
+        "medium": str,
+        "accession_number": str,
+        "classification": str,
+        "department": str,
+        "date_acquired": datetime.datetime,
+        "object_id": float,
+        "completed_date": float,
+        "date_acquired_year": int,
+        "date_acquired_month": int,
+        "date_acquired_weekday": int,
     }
 
     # check for datatypes of input against the validation dictionary
-    for idx in row.keys():
+    for idx in dict_row_type.keys():
         if isinstance(row[idx], dict_row_type[idx]) is False:
             logging.error(f"Type check failed for :{idx}, {row[idx]}")
             return False
     return True
 
+def rename_columns(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Rename columns in dataframe into required format
+
+    Parameters
+    ----------
+        data: pd.DataFrame
+            pandas dataframe containing data
+
+    Returns
+    -------
+        pd.DataFrame
+    """
+    column_dict = {
+        "ConstituentID": "constituent_id",
+        "DisplayName": "display_name",
+        "Nationality": "nationality",
+        "Gender": "gender",
+        "BeginDate": "begin_date",
+        "EndDate": "end_date",
+        "Title": "title",
+        "Medium": "medium",
+        "AccessionNumber": "accession_number",
+        "Classification": "classification",
+        "Department": "department",
+        "DateAcquired": "date_acquired",
+        "ObjectID": "object_id",
+        "completedDate": "completed_date",
+        "DateAcquired_year": "date_acquired_year",
+        "DateAcquired_month": "date_acquired_month",
+        "DateAcquired_weekday": "date_acquired_weekday",
+    }
+    data = data.rename(columns=column_dict)
+
+    return data
 
 # ingest data
 def ingest_data(data: pd.DataFrame) -> None:
@@ -156,11 +181,12 @@ def ingest_data(data: pd.DataFrame) -> None:
     """
 
     # iterate through the data to insert the values into the database
+
+    logging.info("Data ingestion into database started")
     for idx in data.iterrows():
         try:
             row = idx[1].to_dict()
 
-            logging.info("Data ingestion into database started")
             # validate the row before inserting into db
             if type_check(row):
                 line = ArtWork()
@@ -180,6 +206,7 @@ def ingest_data(data: pd.DataFrame) -> None:
 if __name__ == "__main__":
     # load environment variables
     db_uri = os.environ.get("DB_URI")
+    path = os.environ.get("FILE_PATH")
 
     # create connection to postgres
     engine = create_engine(db_uri)
@@ -188,8 +215,8 @@ if __name__ == "__main__":
 
     with Session(bind=engine) as session:
         logging.info("Opening database session")
-        data_path = path
-        data = load_data_from_file(data_path)
+        data = load_data_from_file(path)
+        data = rename_columns(data)
         ingest_data(data)
 
     logging.info("Closing all session")
